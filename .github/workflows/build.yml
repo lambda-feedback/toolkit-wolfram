@@ -24,7 +24,9 @@ jobs:
     steps:
       - name: Checkout
         id: checkout-code-step
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Build
         id: build-paclet-step
@@ -37,7 +39,7 @@ jobs:
 
       - name: UploadArtifact
         id: upload-build-artifacts-step
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           path: ${{ env.PACLET_BUILD_DIR }}
           if-no-files-found: ignore
@@ -45,7 +47,7 @@ jobs:
       - name: UploadWorkflowValues
         id: upload-workflow-values-step
         if: always() && env.PACLET_WORKFLOW_VALUES
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: paclet-workflow-values
           path: ${{ env.PACLET_WORKFLOW_VALUES }}
