@@ -7,7 +7,7 @@ PacletObject[
     "Creator" -> "Andreas Pfurtscheller",
     "License" -> "MIT",
     "PublisherID" -> "AndreasPfurtscheller",
-    "Version" -> "0.0.1",
+    "Version" -> "1.0.0",
     "WolframVersion" -> "13.+",
     "PrimaryContext" -> "AndreasPfurtscheller`EvaluationFunctionToolkit`",
     "Extensions" -> {

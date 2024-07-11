@@ -136,11 +136,11 @@ Serve[eval_] := Module[{},
 
   listener = SocketListen[socket, handler, RecordSeparators -> {"\n"}];
 
-  Print["Listening on ", socketAddress];
+  (* Print["Listening on ", socketAddress]; *)
 
   While[True, Pause[60]];
 
-  Print["Closing connection"];
+  (* Print["Closing connection"]; *)
 
   DeleteObject[listener];
   Close[socket];
