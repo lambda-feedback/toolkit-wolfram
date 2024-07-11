@@ -30,7 +30,7 @@ jobs:
       - name: Build
         uses: WolframResearch/build-paclet@v1.11.0
         with:
-          target: Submit
+          target: Build
           paclet_cicd_version: 0.36.0
 
       - name: UploadArtifact
