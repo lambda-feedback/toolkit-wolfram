@@ -1,4 +1,4 @@
-name: Build
+name: Build and Submit Paclet
 
 on:
   workflow_dispatch:
@@ -13,8 +13,8 @@ env:
   WLPR_PACLET_SITE: https://resources.wolframcloud.com/PacletRepository/pacletsite
 
 jobs:
-  Build:
-    name: Build
+  build:
+    name: Build and Submit
     runs-on: ubuntu-latest
     container:
       image: wolframresearch/wolframengine:13.3.0
@@ -30,13 +30,10 @@ jobs:
         id: build-paclet-step
         uses: WolframResearch/build-paclet@v1.11.0
         with:
-          target: Build
-          # TODO: find out how to submit to the paclet repository
-          # target: Submit
+          target: Submit
           paclet_cicd_version: 0.36.0
-          # TODO: find out how to generate the definition notebook
-          # definition_notebook: ./ResourceDefinition.nb
-          # resource_system_base: https://www.wolframcloud.com/obj/resourcesystem/api/1.0
+          definition_notebook: ./ResourceDefinition.nb
+          resource_system_base: https://www.wolframcloud.com/obj/resourcesystem/api/1.0
 
       - name: UploadArtifact
         id: upload-build-artifacts-step
