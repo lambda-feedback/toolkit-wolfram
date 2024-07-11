@@ -2,7 +2,7 @@
 
 ## Introduction
 
-This package provides a toolkit for creating evaluation functions for the Wolfram Language.
+A collection of utilities for creating Lambda Feedback evaluation functions for the Wolfram Language.
 
 ## Development
 

@@ -1,4 +1,6 @@
-BeginPackage["EvaluationFunctionToolkit`"]
+(* ::Package:: *)
+
+BeginPackage["AndreasPfurtscheller`EvaluationFunctionToolkit`"]
 
 (* Export public symbols *)
 
@@ -140,7 +142,7 @@ Serve[eval_] := Module[{},
 
   Print["Closing connection"];
 
-  DeleteObject[listener]
+  DeleteObject[listener];
   Close[socket];
 ];
 
