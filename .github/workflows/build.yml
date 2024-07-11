@@ -17,7 +17,7 @@ jobs:
     name: Build and Submit
     runs-on: ubuntu-latest
     container:
-      image: wolframresearch/wolframengine:13.3.0
+      image: wolframresearch/wolframengine:latest
       options: --user root
     env:
       WOLFRAM_SYSTEM_ID: Linux-x86-64
