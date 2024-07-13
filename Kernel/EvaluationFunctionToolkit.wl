@@ -1,6 +1,6 @@
 (* ::Package:: *)
 
-BeginPackage["AndreasPfurtscheller`EvaluationFunctionToolkit`"]
+BeginPackage["LambdaFeedback`EvaluationFunctionToolkit`"]
 
 (* Export public symbols *)
 
