@@ -5,6 +5,7 @@ BeginPackage["LambdaFeedback`EvaluationFunctionToolkit`"]
 (* Export public symbols *)
 
 Serve
+ServeFile
 
 Begin["`Private`"]
 
@@ -144,6 +145,87 @@ Serve[eval_] := Module[{},
 
   DeleteObject[listener];
   Close[socket];
+];
+
+(* ---- File-based transport ---- *)
+
+buildErrorResult[msg_] := <| "message" -> ToString[msg] |>;
+
+(* Catches Wolfram Messages raised by user code so a crash still produces a
+   JSON response instead of leaving the response file unwritten. *)
+safeCall[fn_, args___] := Quiet@Check[fn[args], $Failed];
+
+processEvalRequest[evalFn_, requestData_] := Module[
+  {params, answer, response, evalParams, result, errorMsg},
+  params = requestData["params"];
+  answer = params["answer"];
+  response = params["response"];
+  evalParams = params["params"];
+
+  Print["Running eval"];
+  result = safeCall[evalFn, answer, response, evalParams];
+
+  If[result === $Failed,
+    Return[<| "command" -> "eval", "error" -> buildErrorResult["Evaluation function raised an error"] |>]
+  ];
+
+  errorMsg = Lookup[result, "error", Null];
+  If[errorMsg =!= Null,
+    Return[<| "command" -> "eval", "error" -> buildErrorResult[errorMsg] |>]
+  ];
+
+  <|
+    "command" -> "eval",
+    "result" -> <|
+      "is_correct" -> result["is_correct"],
+      "feedback" -> result["feedback"]
+    |>
+  |>
+];
+
+processPreviewRequest[previewFn_, requestData_] := Module[
+  {params, response, previewParams, result},
+  params = requestData["params"];
+  response = params["response"];
+  previewParams = Lookup[params, "params", <||>];
+
+  Print["Running preview"];
+  result = safeCall[previewFn, response, previewParams];
+
+  If[result === $Failed,
+    Return[<| "command" -> "preview", "error" -> buildErrorResult["Preview function raised an error"] |>]
+  ];
+
+  <| "command" -> "preview", "result" -> <| "preview" -> result |> |>
+];
+
+processFileRequest[evalFn_, previewFn_, requestData_] := Module[{command},
+  command = Lookup[requestData, "command", "unknown"];
+  Which[
+    command === "eval", processEvalRequest[evalFn, requestData],
+    command === "preview", processPreviewRequest[previewFn, requestData],
+    True, <| "command" -> command, "error" -> buildErrorResult["Unknown command: " <> ToString[command]] |>
+  ]
+];
+
+ServeFile[evalFn_, previewFn_, requestPath_String, responsePath_String] := Module[
+  {requestData, responseData},
+  requestData = Import[requestPath, "JSON"] //. List :> Association;
+
+  Print["Input"];
+  Print[requestData];
+
+  responseData = processFileRequest[evalFn, previewFn, requestData];
+
+  Print["Output"];
+  Print[responseData];
+
+  Export[responsePath, responseData, "JSON", "Compact" -> True];
+];
+
+ServeFile[evalFn_, previewFn_] := Module[{argv},
+  argv = Rest[$ScriptCommandLine];
+  ServeFile[evalFn, previewFn, argv[[1]], argv[[2]]]
 ];
 
 End[] (* End `Private` *)
