@@ -32,13 +32,17 @@ jobs:
           COMPANY_NAME: ${{ secrets.WOLFRAM_LICENSE_COMPANY_NAME }}
           LICENSE_KEY: ${{ secrets.WOLFRAM_LICENSE_KEY }}
         run: |
-          if [ ! -e "$HOME/.Wolfram/Licensing/mathpass" ]; then
-            wolframscript <<EOF
+          if [ ! -e /root/.Wolfram/Licensing/mathpass ]; then
+            /usr/local/Wolfram/Wolfram/15.0/Executables/WolframKernel <<EOF
           $NAME
           $COMPANY_NAME
           $LICENSE_KEY
           Quit[]
           EOF
+          fi
+          if [ ! -e /root/.Wolfram/Licensing/mathpass ]; then
+            echo "::error::Wolfram licensing failed. Check that WOLFRAM_LICENSE_NAME, WOLFRAM_LICENSE_COMPANY_NAME, and WOLFRAM_LICENSE_KEY secrets are set correctly."
+            exit 1
           fi
 
       - name: Install build tooling
