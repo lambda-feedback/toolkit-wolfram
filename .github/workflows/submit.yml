@@ -49,7 +49,8 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/check-paclet.git /tmp/check-paclet
-          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD", "Temporary" -> False]'
+          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Check
         env:
@@ -113,7 +114,8 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/test-paclet.git /tmp/test-paclet
-          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD", "Temporary" -> False]'
+          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Test
         env:
@@ -178,7 +180,8 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/submit-paclet.git /tmp/submit-paclet
-          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD", "Temporary" -> False]'
+          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Submit
         env:
