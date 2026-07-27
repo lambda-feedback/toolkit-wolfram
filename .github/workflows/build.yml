@@ -50,11 +50,7 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/build-paclet.git /tmp/build-paclet
-          USER_BASE_DIR=$(wolframscript -code 'Print[$UserBaseDirectory]')
-          echo "UserBaseDirectory: $USER_BASE_DIR"
-          mkdir -p "$USER_BASE_DIR/Kernel"
-          echo 'PacletDirectoryAdd["/tmp/PacletCICD"];' > "$USER_BASE_DIR/Kernel/init.m"
-          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Build
         env:
@@ -65,7 +61,7 @@ jobs:
           INPUT_PACLET_CICD_VERSION: "0.36.0"
           INPUT_RESOURCE_SYSTEM_BASE: https://www.wolframcloud.com/obj/resourcesystem/api/1.0
         run: |
-          wolframscript -file /tmp/build-paclet/src/build_paclet.wls
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Get["/tmp/build-paclet/src/build_paclet.wls"]'
           WS_EXIT_CODE=$?
           if [ "$WS_EXIT_CODE" -eq 139 ]; then
             echo "::warning::Warning: wolframscript did not exit cleanly"

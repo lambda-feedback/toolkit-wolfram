@@ -49,11 +49,7 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/check-paclet.git /tmp/check-paclet
-          USER_BASE_DIR=$(wolframscript -code 'Print[$UserBaseDirectory]')
-          echo "UserBaseDirectory: $USER_BASE_DIR"
-          mkdir -p "$USER_BASE_DIR/Kernel"
-          echo 'PacletDirectoryAdd["/tmp/PacletCICD"];' > "$USER_BASE_DIR/Kernel/init.m"
-          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Check
         env:
@@ -63,7 +59,7 @@ jobs:
           INPUT_PACLET_CICD_VERSION: "0.36.0"
           INPUT_RESOURCE_SYSTEM_BASE: https://www.wolframcloud.com/obj/resourcesystem/api/1.0
         run: |
-          wolframscript -file /tmp/check-paclet/src/check_paclet.wls
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Get["/tmp/check-paclet/src/check_paclet.wls"]'
           WS_EXIT_CODE=$?
           if [ "$WS_EXIT_CODE" -eq 139 ]; then
             echo "::warning::Warning: wolframscript did not exit cleanly"
@@ -117,11 +113,7 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/test-paclet.git /tmp/test-paclet
-          USER_BASE_DIR=$(wolframscript -code 'Print[$UserBaseDirectory]')
-          echo "UserBaseDirectory: $USER_BASE_DIR"
-          mkdir -p "$USER_BASE_DIR/Kernel"
-          echo 'PacletDirectoryAdd["/tmp/PacletCICD"];' > "$USER_BASE_DIR/Kernel/init.m"
-          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Test
         env:
@@ -131,7 +123,7 @@ jobs:
           INPUT_PACLET_CICD_VERSION: "0.36.0"
           INPUT_RESOURCE_SYSTEM_BASE: https://www.wolframcloud.com/obj/resourcesystem/api/1.0
         run: |
-          wolframscript -file /tmp/test-paclet/src/test_paclet.wls
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Get["/tmp/test-paclet/src/test_paclet.wls"]'
           WS_EXIT_CODE=$?
           if [ "$WS_EXIT_CODE" -eq 139 ]; then
             echo "::warning::Warning: wolframscript did not exit cleanly"
@@ -186,11 +178,7 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/submit-paclet.git /tmp/submit-paclet
-          USER_BASE_DIR=$(wolframscript -code 'Print[$UserBaseDirectory]')
-          echo "UserBaseDirectory: $USER_BASE_DIR"
-          mkdir -p "$USER_BASE_DIR/Kernel"
-          echo 'PacletDirectoryAdd["/tmp/PacletCICD"];' > "$USER_BASE_DIR/Kernel/init.m"
-          wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Submit
         env:
@@ -198,7 +186,7 @@ jobs:
           INPUT_PACLET_CICD_VERSION: "0.36.0"
           INPUT_RESOURCE_SYSTEM_BASE: https://www.wolframcloud.com/obj/resourcesystem/api/1.0
         run: |
-          wolframscript -file /tmp/submit-paclet/src/submit_paclet.wls
+          wolframscript -code 'PacletDirectoryLoad["/tmp/PacletCICD"]; Get["/tmp/submit-paclet/src/submit_paclet.wls"]'
           WS_EXIT_CODE=$?
           if [ "$WS_EXIT_CODE" -eq 139 ]; then
             echo "::warning::Warning: wolframscript did not exit cleanly"
