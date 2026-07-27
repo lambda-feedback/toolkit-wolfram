@@ -27,6 +27,21 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Activate Wolfram Engine
+        env:
+          NAME: ${{ secrets.WOLFRAM_LICENSE_NAME }}
+          COMPANY_NAME: ${{ secrets.WOLFRAM_LICENSE_COMPANY_NAME }}
+          LICENSE_KEY: ${{ secrets.WOLFRAM_LICENSE_KEY }}
+        run: |
+          if [ ! -e "$HOME/.Wolfram/Licensing/mathpass" ]; then
+            wolframscript <<EOF
+          $NAME
+          $COMPANY_NAME
+          $LICENSE_KEY
+          Quit[]
+          EOF
+          fi
+
       - name: Build
         uses: WolframResearch/build-paclet@v1.11.0
         with:
