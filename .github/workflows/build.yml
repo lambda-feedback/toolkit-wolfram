@@ -50,7 +50,10 @@ jobs:
           apt-get update && apt-get install -y --no-install-recommends git ca-certificates
           git clone --depth 1 --branch v0.36.0 https://github.com/WolframResearch/PacletCICD.git /tmp/PacletCICD
           git clone --depth 1 --branch v1.11.0 https://github.com/WolframResearch/build-paclet.git /tmp/build-paclet
-          wolframscript -code 'PacletDirectoryAdd["/tmp/PacletCICD", "Temporary" -> False]'
+          USER_BASE_DIR=$(wolframscript -code 'Print[$UserBaseDirectory]')
+          echo "UserBaseDirectory: $USER_BASE_DIR"
+          mkdir -p "$USER_BASE_DIR/Kernel"
+          echo 'PacletDirectoryAdd["/tmp/PacletCICD"];' > "$USER_BASE_DIR/Kernel/init.m"
           wolframscript -code 'Needs["Wolfram`PacletCICD`"]; Print["Loaded PacletCICD from: ", FindFile["Wolfram`PacletCICD`"]]'
 
       - name: Build
