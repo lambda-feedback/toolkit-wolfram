@@ -48,10 +48,12 @@ If `EvaluationFunction` or `PreviewFunction` raises a Wolfram error/message
 
 ## Development
 
-### Publishing
+### Consuming this toolkit
 
-For building and publishing the Paclet, the [`build-paclet`](https://github.com/marketplace/actions/build-paclet) GitHub action is used.
+This toolkit is not published to the Wolfram Paclet Repository. Wolfram-based
+evaluation functions consume it by `git clone`ing a tagged version and pointing
+`PacletDirectoryLoad` at the checkout — see
+`evaluation-function-base/wolfram/Dockerfile`'s `TOOLKIT_WOLFRAM_VERSION` build arg.
 
-This action uses the [`Wolfram/PacletCICD`](https://resources.wolframcloud.com/PacletRepository/resources/Wolfram/PacletCICD/version/0.36.0/) utilities to build and publish the Paclet.
-
-Please refer to the documentation of the action and the utilities for more information.
+To release a new version, tag the commit (`git tag vX.Y.Z && git push origin vX.Y.Z`)
+and bump `TOOLKIT_WOLFRAM_VERSION` in `evaluation-function-base/wolfram/Dockerfile`.
