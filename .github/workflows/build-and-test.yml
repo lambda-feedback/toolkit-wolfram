@@ -1,0 +1,73 @@
+name: Build & Test Paclet
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    tags:
+      - "v*.*.*"
+  pull_request:
+    branches: [main]
+
+jobs:
+  ci:
+    name: Build & Test
+    runs-on: ubuntu-latest
+    container:
+      image: jonmcloone/wwe:LabJul1
+      options: --user root
+    env:
+      WOLFRAM_SYSTEM_ID: Linux-x86-64
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Activate Wolfram Engine
+        env:
+          NAME: ${{ secrets.WOLFRAM_LICENSE_NAME }}
+          COMPANY_NAME: ${{ secrets.WOLFRAM_LICENSE_COMPANY_NAME }}
+          LICENSE_KEY: ${{ secrets.WOLFRAM_LICENSE_KEY }}
+        run: |
+          if [ ! -e /root/.Wolfram/Licensing/mathpass ]; then
+            /usr/local/Wolfram/Wolfram/15.0/Executables/WolframKernel <<EOF
+          $NAME
+          $COMPANY_NAME
+          $LICENSE_KEY
+          Quit[]
+          EOF
+          fi
+          if [ ! -e /root/.Wolfram/Licensing/mathpass ]; then
+            echo "::error::Wolfram licensing failed. Check that WOLFRAM_LICENSE_NAME, WOLFRAM_LICENSE_COMPANY_NAME, and WOLFRAM_LICENSE_KEY secrets are set correctly."
+            exit 1
+          fi
+
+      - name: Build paclet archive
+        run: |
+          mkdir -p /tmp/paclet-build
+          wolframscript -code '
+            archive = CreatePacletArchive[Directory[], "/tmp/paclet-build"];
+            If[FailureQ[archive] || !FileExistsQ[archive],
+              Print["::error::Failed to build paclet archive"];
+              Exit[1]
+            ];
+            Print["Built: ", archive];
+          '
+
+      - name: Run tests
+        run: |
+          wolframscript -code '
+            PacletDirectoryLoad["."];
+            Needs["LambdaFeedback`EvaluationFunctionToolkit`"];
+            report = TestReport["Tests/ServeFile.wlt"];
+            Print["Succeeded: ", report["TestsSucceededCount"]];
+            Print["Failed: ", report["TestsFailedCount"]];
+            If[report["TestsFailedCount"] > 0, Exit[1]];
+          '
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          path: /tmp/paclet-build
+          if-no-files-found: ignore
