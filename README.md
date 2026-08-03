@@ -12,8 +12,10 @@ The toolkit exposes one function per Shimmy comms transport. Currently:
   (`FUNCTION_INTERFACE="file"`): reads a request JSON file and writes a
   response JSON file, as invoked by `wolframscript -f evaluation_function.wl
   request.json response.json`.
-- `Serve[EvaluationFunction]` — a socket/JSON-RPC transport for the `eval`
-  method only.
+- `Serve[EvaluationFunction, PreviewFunction]` — the `tcp` RPC transport
+  (`EVAL_RPC_TRANSPORT="tcp"`): a persistent JSON-RPC 2.0 socket server
+  supporting the `eval` and `preview` methods. `healthcheck` is not yet
+  implemented.
 
 More Shimmy transports (stdio, ipc) are expected to be added over time,
 mirroring [`toolkit-python`](https://github.com/lambda-feedback/toolkit-python)'s
@@ -43,8 +45,11 @@ ServeFile[EvaluationFunction, PreviewFunction]
 functions are free to embed their own inline error/unavailable state.
 
 If `EvaluationFunction` or `PreviewFunction` raises a Wolfram error/message
-(not a `Throw`/`Abort`), `ServeFile` catches it and returns a normal
-`{"command", "error"}` JSON response rather than crashing.
+(not a `Throw`/`Abort`), both `ServeFile` and `Serve` catch it rather than
+crashing. `ServeFile` returns a normal `{"command", "error"}` JSON response;
+`Serve` returns a JSON-RPC 2.0 error object (`{"error": {"code", "message"}}`),
+since a nested `"error"` key inside the JSON-RPC `"result"` would not be
+recognized as an error by Shimmy on the RPC transports.
 
 ## Development
 
