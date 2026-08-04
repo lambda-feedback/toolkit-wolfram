@@ -67,10 +67,15 @@ supported entry point for evaluation function repos — calling `ServeFile`/
 `Serve` directly means hand-rolling the transport-selection logic they exist
 to avoid.
 
-More Shimmy transports (stdio, ipc) are expected to be added over time,
-mirroring [`toolkit-python`](https://github.com/lambda-feedback/toolkit-python)'s
+More Shimmy transports (stdio, ipc, http, ws) are expected to be added over
+time, mirroring [`toolkit-python`](https://github.com/lambda-feedback/toolkit-python)'s
 `lf_toolkit/io/`, each plugged into `ServeEvaluationFunction`'s dispatch as it
-lands.
+lands. `stdio` in particular is blocked on Wolfram Engine, not just unwritten:
+there is no supported way to get a readable stream handle onto a process's
+real inherited stdin (`ReadLine`/`BinaryReadList` on `"stdin"` or
+`"/dev/stdin"` both fail, confirmed on macOS and in the Linux worker image,
+across every invocation mode tried). Revisiting it needs a LibraryLink C
+shim, not a pure-WL fix.
 
 `EvaluationFunction` must return an association with `is_correct`,
 `feedback`, and `error` (`Null` on success, an error message otherwise).
