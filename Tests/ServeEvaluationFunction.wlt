@@ -35,6 +35,17 @@ VerificationTest[
   TestID -> "Dispatch-rpc-stdio-not-yet-implemented"
 ]
 
+(* Regression test: Failure[tag, <|"Message" -> "..."|>] does NOT make that
+   text retrievable via failure["Message"] -- Failure only recognizes
+   "MessageTemplate" for that. Silently building Failures with the wrong key
+   meant every "FATAL: ..." exit printed a useless generic
+   "A failure of type ... occurred." instead of the actual diagnostic. *)
+VerificationTest[
+  dispatchTransport["rpc", "stdio"]["Message"],
+  "EVAL_RPC_TRANSPORT=stdio is a recognized Shimmy transport, but toolkit-wolfram does not implement it yet.",
+  TestID -> "Dispatch-rpc-stdio-message-is-not-generic"
+]
+
 VerificationTest[
   FailureQ[dispatchTransport["rpc", "ipc"]],
   True,
@@ -42,9 +53,9 @@ VerificationTest[
 ]
 
 VerificationTest[
-  FailureQ[dispatchTransport["rpc", "http"]],
-  True,
-  TestID -> "Dispatch-rpc-http-not-yet-implemented"
+  dispatchTransport["rpc", "http"],
+  ServeHttp,
+  TestID -> "Dispatch-rpc-http"
 ]
 
 VerificationTest[

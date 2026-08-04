@@ -43,13 +43,13 @@ ServeEvaluationFunction[EvaluationFunction, PreviewFunction]
   (Shimmy's `"FILE"`, unset, or unrecognized) falls back to the file
   transport.
 - `EVAL_RPC_TRANSPORT` (only consulted when `EVAL_IO="rpc"`) — selects which
-  RPC transport to run. Currently only `"tcp"` is implemented. `"stdio"`,
-  `"ipc"`, `"http"`, `"ws"` are recognized Shimmy transports not yet
-  implemented in this toolkit; any other value is unrecognized. Either case
-  exits the process with a clear message and nonzero status rather than
-  silently falling back to a different transport — a grading worker doing
-  the wrong thing silently is worse than failing loudly where Shimmy's
-  supervisor can observe it.
+  RPC transport to run. `"tcp"` and `"http"` are implemented. `"stdio"`,
+  `"ipc"`, `"ws"` are recognized Shimmy transports not yet implemented in
+  this toolkit; any other value is unrecognized. Either case exits the
+  process with a clear message and nonzero status rather than silently
+  falling back to a different transport — a grading worker doing the wrong
+  thing silently is worse than failing loudly where Shimmy's supervisor can
+  observe it.
 
 Internally, this dispatches to one function per Shimmy comms transport:
 
@@ -61,13 +61,24 @@ Internally, this dispatches to one function per Shimmy comms transport:
   (`EVAL_RPC_TRANSPORT="tcp"`): a persistent JSON-RPC 2.0 socket server
   supporting the `eval` and `preview` methods. `healthcheck` is not yet
   implemented.
+- `ServeHttp[EvaluationFunction, PreviewFunction]` — the `http` RPC transport
+  (`EVAL_RPC_TRANSPORT="http"`): a JSON-RPC 2.0 server listening on the URL
+  given by `EVAL_RPC_HTTP_URL` (default `http://127.0.0.1:8000/` when unset,
+  for direct/manual invocation outside Shimmy). Each request is a single
+  `POST` whose body is a JSON-RPC 2.0 request; the response is written back
+  as the HTTP body. Shimmy's http transport is go-ethereum's generic
+  JSON-RPC HTTP client, which requires a 2xx status to read the body as
+  JSON-RPC at all — so, like `Serve`, every outcome (success, domain error,
+  caught crash) comes back as HTTP `200` with a JSON-RPC envelope, never a
+  non-2xx status. The connection is closed after each response; no
+  keep-alive. `healthcheck` is not yet implemented.
 
 These remain exported for testing, but `ServeEvaluationFunction` is the
 supported entry point for evaluation function repos — calling `ServeFile`/
-`Serve` directly means hand-rolling the transport-selection logic they exist
-to avoid.
+`Serve`/`ServeHttp` directly means hand-rolling the transport-selection logic
+they exist to avoid.
 
-More Shimmy transports (stdio, ipc, http, ws) are expected to be added over
+More Shimmy transports (stdio, ipc, ws) are expected to be added over
 time, mirroring [`toolkit-python`](https://github.com/lambda-feedback/toolkit-python)'s
 `lf_toolkit/io/`, each plugged into `ServeEvaluationFunction`'s dispatch as it
 lands. `stdio` in particular is blocked on Wolfram Engine, not just unwritten:
@@ -84,11 +95,12 @@ shim, not a pure-WL fix.
 functions are free to embed their own inline error/unavailable state.
 
 If `EvaluationFunction` or `PreviewFunction` raises a Wolfram error/message
-(not a `Throw`/`Abort`), both `ServeFile` and `Serve` catch it rather than
-crashing. `ServeFile` returns a normal `{"command", "error"}` JSON response;
-`Serve` returns a JSON-RPC 2.0 error object (`{"error": {"code", "message"}}`),
-since a nested `"error"` key inside the JSON-RPC `"result"` would not be
-recognized as an error by Shimmy on the RPC transports.
+(not a `Throw`/`Abort`), `ServeFile`, `Serve`, and `ServeHttp` all catch it
+rather than crashing. `ServeFile` returns a normal `{"command", "error"}`
+JSON response; `Serve` and `ServeHttp` return a JSON-RPC 2.0 error object
+(`{"error": {"code", "message"}}`), since a nested `"error"` key inside the
+JSON-RPC `"result"` would not be recognized as an error by Shimmy on the RPC
+transports.
 
 ## Development
 

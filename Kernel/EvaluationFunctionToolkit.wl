@@ -6,6 +6,7 @@ BeginPackage["LambdaFeedback`EvaluationFunctionToolkit`"]
 
 Serve
 ServeFile
+ServeHttp
 ServeEvaluationFunction
 
 Begin["`Private`"]
@@ -16,6 +17,7 @@ Get[FileNameJoin[{$packageDir, "EvaluationFunctionToolkit", "Execution.wl"}]];
 Get[FileNameJoin[{$packageDir, "EvaluationFunctionToolkit", "FileTransport.wl"}]];
 Get[FileNameJoin[{$packageDir, "EvaluationFunctionToolkit", "JsonRpc.wl"}]];
 Get[FileNameJoin[{$packageDir, "EvaluationFunctionToolkit", "TcpTransport.wl"}]];
+Get[FileNameJoin[{$packageDir, "EvaluationFunctionToolkit", "HttpTransport.wl"}]];
 Get[FileNameJoin[{$packageDir, "EvaluationFunctionToolkit", "Dispatch.wl"}]];
 
 End[] (* End `Private` *)

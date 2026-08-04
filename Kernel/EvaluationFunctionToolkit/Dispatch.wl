@@ -22,7 +22,7 @@
    *can* read real stdin internally, but never exposes it as a Streams[]
    object user code can Read from. Revisit only alongside a LibraryLink C
    shim (raw read(2)/write(2) on fd 0/1), not as a pure-WL fix. *)
-$unimplementedRpcTransports = {"stdio", "ipc", "http", "ws"};
+$unimplementedRpcTransports = {"stdio", "ipc", "ws"};
 
 (* dispatchTransport[evalIO, rpcTransport] -> the Serve-family function to
    call, or Failure[...] describing why none could be selected. Never talks
@@ -37,14 +37,16 @@ dispatchTransport[evalIO_String, rpcTransport_String] := Which[
     ServeFile,
   rpcTransport === "tcp",
     Serve,
+  rpcTransport === "http",
+    ServeHttp,
   MemberQ[$unimplementedRpcTransports, rpcTransport],
     Failure["UnimplementedRpcTransport", <|
-      "Message" -> "EVAL_RPC_TRANSPORT=" <> rpcTransport <>
+      "MessageTemplate" -> "EVAL_RPC_TRANSPORT=" <> rpcTransport <>
         " is a recognized Shimmy transport, but toolkit-wolfram does not implement it yet."
     |>],
   True,
     Failure["UnknownRpcTransport", <|
-      "Message" -> "Unrecognized EVAL_RPC_TRANSPORT value: " <> rpcTransport
+      "MessageTemplate" -> "Unrecognized EVAL_RPC_TRANSPORT value: " <> rpcTransport
     |>]
 ];
 
