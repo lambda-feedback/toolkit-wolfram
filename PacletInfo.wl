@@ -7,7 +7,7 @@ PacletObject[
     "Creator" -> "Andreas Pfurtscheller",
     "License" -> "MIT",
     "PublisherID" -> "LambdaFeedback",
-    "Version" -> "1.1.0",
+    "Version" -> "1.2.0",
     "WolframVersion" -> "13.+",
     "PrimaryContext" -> "LambdaFeedback`EvaluationFunctionToolkit`",
     "Extensions" -> {

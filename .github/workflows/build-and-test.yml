@@ -60,10 +60,14 @@ jobs:
           wolframscript -code '
             PacletDirectoryLoad["."];
             Needs["LambdaFeedback`EvaluationFunctionToolkit`"];
-            report = TestReport["Tests/ServeFile.wlt"];
-            Print["Succeeded: ", report["TestsSucceededCount"]];
-            Print["Failed: ", report["TestsFailedCount"]];
-            If[report["TestsFailedCount"] > 0, Exit[1]];
+            testFiles = FileNames["*.wlt", "Tests"];
+            reports = TestReport /@ testFiles;
+            MapThread[
+              Print[#1, " -> Succeeded: ", #2["TestsSucceededCount"], " Failed: ", #2["TestsFailedCount"]] &,
+              {testFiles, reports}
+            ];
+            totalFailed = Total[#["TestsFailedCount"] & /@ reports];
+            If[totalFailed > 0, Exit[1]];
           '
 
       - name: Upload artifact
